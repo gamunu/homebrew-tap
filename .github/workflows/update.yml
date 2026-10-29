@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 Gamunu Balagalla
+
+name: update
+
+# Bump Casks/hpcups-macos.rb when gamunu/hpcups-macos publishes a new
+# release. Polling keeps the release repository free of a cross-repo
+# token.
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Bump cask to the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          tag=$(gh release view --repo gamunu/hpcups-macos --json tagName -q .tagName)
+          version=${tag#v}
+          current=$(sed -n 's/^  version "\(.*\)"/\1/p' Casks/hpcups-macos.rb)
+          if [ "$version" = "$current" ]; then
+            echo "already at $version"
+            exit 0
+          fi
+          sha=$(gh release download "$tag" --repo gamunu/hpcups-macos -p SHA256SUMS -O - \
+            | awk -v f="hpcups-macos-$version.pkg" '$2 == f { print $1 }')
+          [ -n "$sha" ] || { echo "no checksum for $version"; exit 1; }
+          sed -i "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/" Casks/hpcups-macos.rb
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "hpcups-macos $version" -m "Signed-off-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          git push
