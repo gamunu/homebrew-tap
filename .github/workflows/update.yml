@@ -3,7 +3,7 @@
 
 name: update
 
-# Bump Casks/hpcups-macos.rb when gamunu/hpcups-macos publishes a new
+# Bump Casks/smudge.rb when gamunu/smudge publishes a new
 # release. Polling keeps the release repository free of a cross-repo
 # token.
 
@@ -26,18 +26,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -eu
-          tag=$(gh release view --repo gamunu/hpcups-macos --json tagName -q .tagName)
+          tag=$(gh release view --repo gamunu/smudge --json tagName -q .tagName)
           version=${tag#v}
-          current=$(sed -n 's/^  version "\(.*\)"/\1/p' Casks/hpcups-macos.rb)
+          current=$(sed -n 's/^  version "\(.*\)"/\1/p' Casks/smudge.rb)
           if [ "$version" = "$current" ]; then
             echo "already at $version"
             exit 0
           fi
-          sha=$(gh release download "$tag" --repo gamunu/hpcups-macos -p SHA256SUMS -O - \
-            | awk -v f="hpcups-macos-$version.pkg" '$2 == f { print $1 }')
+          sha=$(gh release download "$tag" --repo gamunu/smudge -p SHA256SUMS -O - \
+            | awk -v f="smudge-$version.pkg" '$2 == f { print $1 }')
           [ -n "$sha" ] || { echo "no checksum for $version"; exit 1; }
-          sed -i "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/" Casks/hpcups-macos.rb
+          sed -i "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/" Casks/smudge.rb
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "hpcups-macos $version" -m "Signed-off-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          git commit -am "smudge $version" -m "Signed-off-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
           git push
