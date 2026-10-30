@@ -21,9 +21,11 @@ cask "smudge" do
 
   pkg "smudge-#{version}.pkg"
 
-  uninstall pkgutil: "io.github.gamunu.smudge",
-            delete:  [
+  uninstall launchctl: "io.github.gamunu.smudge.firmware",
+            pkgutil:   "io.github.gamunu.smudge",
+            delete:    [
               "/Applications/Smudge.app",
+              "/Library/LaunchDaemons/io.github.gamunu.smudge.firmware.plist",
               "/Library/Printers/smudge",
               "/Library/Printers/PPDs/Contents/Resources/HP DeskJet 2300 series (Smudge).ppd.gz",
               "/Library/Printers/PPDs/Contents/Resources/smudge",
