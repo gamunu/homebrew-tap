@@ -2,8 +2,8 @@
 # Copyright (C) 2026 Gamunu Balagalla
 
 cask "smudge" do
-  version "0.2.0"
-  sha256 "0c6c3d9604e96c3a07c639b0e0b5c1d6f8455db1fcbfc55bfd5cc67147911713"
+  version "0.3.0"
+  sha256 "f87b50a6180bbd957c467330715b50ea666a612877e6fe7963afdd3ed77abd20"
 
   url "https://github.com/gamunu/smudge/releases/download/v#{version}/smudge-#{version}.pkg"
   name "Smudge"
